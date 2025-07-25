@@ -3,14 +3,18 @@ name: Handle Maven analysis
 on:
   workflow_call:
     inputs:
-      workflow_run:
-        description: Associated workflow_run event
-        type: string
-        required: true
       java_version:
         description: Build Java version
         type: string
         default: "21"
+      project_key:
+        description: Target project key in SonarQube server
+        type: string
+        required: true
+      workflow_run:
+        description: Associated workflow_run event
+        type: string
+        required: true
     secrets:
       sonar_token:
         description: SonarQube analysis API token
@@ -45,6 +49,7 @@ jobs:
     if: fromJSON(needs.prepare.outputs.pull_request).base.ref == 'main'
     uses: ./.github/workflows/sonar-maven.yml
     with:
-      pull_request: ${{ needs.prepare.outputs.pull_request }}
       java_version: "${{ inputs.java_version }}"
+      project_key: "${{ inputs.project_key }}"
+      pull_request: "${{ needs.prepare.outputs.pull_request }}"
     secrets: inherit
