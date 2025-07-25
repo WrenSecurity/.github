@@ -7,6 +7,10 @@ on:
         description: Associated workflow_run event
         type: string
         required: true
+      java_version:
+        description: Build Java version
+        type: string
+        default: "21"
     secrets:
       sonar_token:
         description: SonarQube analysis API token
@@ -42,4 +46,5 @@ jobs:
     uses: ./.github/workflows/sonar-maven.yml
     with:
       pull_request: ${{ needs.prepare.outputs.pull_request }}
+      java_version: "${{ inputs.java_version }}"
     secrets: inherit
