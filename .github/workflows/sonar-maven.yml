@@ -10,7 +10,7 @@ on:
       project_key:
         description: Target project key in SonarQube server
         type: string
-        default: ${{ vars.SONAR_PROJECT_KEY }}
+        required: true
       pull_request:
         description: Associated pull_request event
         type: string
