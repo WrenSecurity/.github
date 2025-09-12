@@ -17,9 +17,6 @@ on:
       build_args:
         description: Additional build arguments
         type: string
-      scanner_opts:
-        description: SonarScanner Java options
-        type: string
     secrets:
       sonar_token:
         description: SonarQube analysis API token
@@ -100,6 +97,5 @@ jobs:
           BUILD_ARGS: ${{ inputs.build_args }}
           SONAR_ARGS: ${{ needs.prepare.outputs.sonar_args }}
           SONAR_TOKEN: ${{ secrets.sonar_token }}
-          SONAR_SCANNER_JAVA_OPTS: ${{ inputs.scanner_opts }}
         run: |
           mvn $BUILD_ARGS $SONAR_ARGS -P metrics verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
