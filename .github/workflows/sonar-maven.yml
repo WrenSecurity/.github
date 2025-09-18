@@ -3,6 +3,10 @@ name: Sonar Maven analysis
 on:
   workflow_call:
     inputs:
+      commit_sha:
+        description: SHA of workflows triggering commit
+        type: string
+        required: true
       java_version:
         description: Build Java version
         type: string
@@ -49,10 +53,13 @@ jobs:
               "-Dsonar.pullrequest.github.repository=\(.base.repo.name)",
               "-Dsonar.pullrequest.provider=GitHub"
             ] | join(" ")')"
+          else
+            SONAR_ARGS="$SONAR_ARGS -Dsonar.branch.name=main"
           fi
+      
           echo "sonar_args=$SONAR_ARGS" >> $GITHUB_OUTPUT
 
-          CHECK_REF=main
+          CHECK_REF=${{ inputs.commit_sha }}
           if [[ $PULL_REQUEST_EVENT ]]; then
             CHECK_REF=$(echo "$PULL_REQUEST_EVENT" | jq -r .head.sha)
           fi
