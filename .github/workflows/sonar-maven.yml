@@ -69,17 +69,17 @@ jobs:
     needs: prepare
     steps:
       - name: Checkout project
-        uses: actions/checkout@v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           ref: ${{ needs.prepare.outputs.check_ref }}
           fetch-depth: 0
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5.0.0
         with:
           distribution: "temurin"
           java-version: "${{ inputs.java_version }}"
       - name: Set up Maven cache
-        uses: actions/cache@v4
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.3.0
         with:
           path: ~/.m2
           key: sonar-maven-${{ runner.os }}-${{ runner.arch }}-${{ needs.prepare.outputs.cache_key }}-${{ hashFiles('**/pom.xml') }}
@@ -87,7 +87,7 @@ jobs:
             sonar-maven-${{ runner.os }}-${{ runner.arch }}-base-${{ hashFiles('**/pom.xml') }}
             sonar-maven-${{ runner.os }}-${{ runner.arch }}-base-
       - name: Set up Sonar cache
-        uses: actions/cache@v4
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.3.0
         with:
           path: ~/.sonar/cache
           key: sonar-cache-${{ runner.os }}-${{ runner.arch }}-${{ needs.prepare.outputs.cache_key }}
