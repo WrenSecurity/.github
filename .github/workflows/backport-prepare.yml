@@ -14,6 +14,13 @@ on:
         description: Associated pull_request event
         required: true
         type: string
+      backport_app_id:
+        description: Wren Security backport app identification
+        required: true
+        type: string
+    secrets:
+      backport_app_key:
+        required: true
 
 jobs:
   prepare:
@@ -56,6 +63,13 @@ jobs:
       matrix:
         target: ${{ fromJSON(needs.prepare.outputs.targets) }}
     steps:
+      - name: Generate GitHub App token
+        id: generate-token
+        uses: actions/create-github-app-token@67018539274d69449ef7c02e8e71183d1719ab42 #v2.1.4
+        with:
+          app-id: ${{ inputs.backport_app_id }}
+          private-key: ${{ secrets.backport_app_key }} 
+
       - name: Checkout target branch
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 #v5.0.0
         with:
@@ -103,16 +117,22 @@ jobs:
         env:
           BACKPORT_BRANCH: backport/pr-${{ fromJSON(inputs.pull_request).number }}-${{ matrix.target }}
           BACKPORT_TARGET: ${{ matrix.target }}
-          PR_NUMBER: ${{ fromJSON(inputs.pull_request).number }}
+          PULL_REQUEST: ${{ toJson(github.event.pull_request) }}
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ steps.generate-token.outputs.token }}
           script: |
             const { repo, owner } = context.repo;
+            const pr = JSON.parse(process.env.PULL_REQUEST);
+
             await github.rest.pulls.create({
-              title: `Backport PR #${process.env.PR_NUMBER} to ${process.env.BACKPORT_TARGET}`,
+              title: `Backport PR #${pr.number} to ${process.env.BACKPORT_TARGET}`,
               owner,
               repo,
               head: process.env.BACKPORT_BRANCH,
               base: process.env.BACKPORT_TARGET,
-              body: `This PR is auto-generated as a backport of #${process.env.PR_NUMBER}.`
+              body: `This PR is auto-generated as a backport of #${pr.number}.
+
+              Original title: ${pr.title}
+              Original author: ${pr.user.login}
+              Original body: ${pr.body}`
             });
