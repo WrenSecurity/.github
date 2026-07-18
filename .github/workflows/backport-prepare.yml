@@ -125,7 +125,7 @@ jobs:
             const pr = JSON.parse(process.env.PULL_REQUEST);
 
             await github.rest.pulls.create({
-              title: `Backport PR #${pr.number} to ${process.env.BACKPORT_TARGET}`,
+              title: `${pr.title} (backport)`,
               owner,
               repo,
               head: process.env.BACKPORT_BRANCH,
@@ -134,5 +134,8 @@ jobs:
 
               Original title: ${pr.title}
               Original author: ${pr.user.login}
-              Original body: ${pr.body}`
+
+              ---
+
+              ${pr.body}`
             });
